@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剪刀石頭布遊戲</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .choice {
+            margin: 10px;
+            cursor: pointer;
+            width: 100px;
+            /* 圖片寬度 */
+            height: 100px;
+            /* 圖片高度 */
+            transition: transform 0.2s;
+            /* 添加過渡效果 */
+        }
+
+        .choice:active {
+            transform: scale(1.1);
+            /* 點擊時放大 */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>剪刀石頭布遊戲</h1>
+    <div class="button-container">
+        <img src="https://g.udn.com.tw/upfiles/B_AR/arthurnote/PSN_PHOTO/847/f_11822847_1.jpg" class="choice" id="rock"
+            alt="石頭">
+        <img src="https://k.sinaimg.cn/n/sinakd20122/225/w600h425/20200317/7969-iqyryku8355837.jpg/w700d1q75cms.jpg"
+            class="choice" id="paper" alt="布">
+        <img src="https://png.pngtree.com/element_our/20190602/ourmid/pngtree-right-hand-than-yeah-gesture-image_1422856.jpg"
+            class="choice" id="scissors" alt="剪刀">
+    </div>
+
+    <script>
+        let playerWins = 0;
+        let computerWins = 0;
+        const choices = ['rock', 'paper', 'scissors'];
+
+        // 音效文件
+
+        const winSound = new Audio('可愛跳躍-500audio.com.mp3');
+        const loseSound = new Audio('yisell_sound_2014042816462037844_88366.mp3');
+        const tieSound = new Audio('休閒遊戲獲得滿分-500audio.com.mp3');
+
+
+        document.getElementById('rock').addEventListener('click', () => play('rock'));
+        document.getElementById('paper').addEventListener('click', () => play('paper'));
+        document.getElementById('scissors').addEventListener('click', () => play('scissors'));
+
+        function play(playerChoice) {
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+            let resultMessage = '';
+
+            if (playerChoice === computerChoice) {
+                resultMessage = `平手！你和電腦都出了 ${getChoiceName(playerChoice)}`;
+                showAlert(resultMessage, 'gray');
+                tieSound.play(); // 播放平手音效
+            } else if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                playerWins++;
+                resultMessage = `你贏了！你出了 ${getChoiceName(playerChoice)}，電腦出了 ${getChoiceName(computerChoice)}`;
+                showAlert(resultMessage, 'green');
+                winSound.play(); // 播放贏的音效
+            } else {
+                computerWins++;
+                resultMessage = `你輸了！你出了 ${getChoiceName(playerChoice)}，電腦出了 ${getChoiceName(computerChoice)}`;
+                showAlert(resultMessage, 'red');
+                loseSound.play(); // 播放輸的音效
+            }
+
+            checkWinner();
+        }
+
+        function getChoiceName(choice) {
+            switch (choice) {
+                case 'rock': return '石頭';
+                case 'paper': return '布';
+                case 'scissors': return '剪刀';
+            }
+        }
+
+        function showAlert(message, color) {
+            Swal.fire({
+                title: '結果',
+                text: message,
+                icon: color === 'green' ? 'success' : color === 'red' ? 'error' : 'info',
+                confirmButtonText: '確定'
+            });
+        }
+
+        function checkWinner() {
+            if (playerWins === 3) {
+                Swal.fire({
+                    title: '你贏了整個遊戲！',
+                    text: '恭喜你獲勝！',
+                    icon: 'success',
+                    confirmButtonText: '重新開始',
+                    cancelButtonText: '結束遊戲',
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetGame();
+                    } else {
+                        Swal.fire('遊戲結束！');
+                    }
+                });
+            } else if (computerWins === 3) {
+                Swal.fire({
+                    title: '電腦贏了整個遊戲！',
+                    text: '很遺憾，你輸了！',
+                    icon: 'error',
+                    confirmButtonText: '重新開始',
+                    cancelButtonText: '結束遊戲',
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetGame();
+                    } else {
+                        Swal.fire('遊戲結束！');
+                    }
+                });
+            }
+        }
+
+        function resetGame() {
+            playerWins = 0;
+            computerWins = 0;
+        }
+    </script>
+</body>
+
+</html>
